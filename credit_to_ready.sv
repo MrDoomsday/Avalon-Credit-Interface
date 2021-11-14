@@ -120,23 +120,21 @@ always_ff @ (posedge clk or negedge reset_n)
 		return_credit 	<= 'h0;
 	end 
 	else 	case({update_credit, fifo_data_rd})
-				2'b00:	if(|current_credit)
-						begin
-							current_credit 	<= current_credit - 1'b1;
-							return_credit 	<= 1'b1;
-						end
-						else
-						begin
-							current_credit 	<= 'h0;
-							return_credit 	<= 1'b0;						
-						end
-				2'b01:		current_credit <= current_credit - 1'b1;
-				2'b10:		current_credit <= current_credit + credit;
-				2'b11:		current_credit <= current_credit + credit - 1'b1;
-				default:	begin 
-								current_credit <= 'h0;
-								return_credit <= 1'b0;
-							end 
+			2'b00:	if(|current_credit) begin
+					current_credit 	<= current_credit - 1'b1;
+					return_credit 	<= 1'b1;
+				end
+				else begin
+					current_credit 	<= 'h0;
+					return_credit 	<= 1'b0;						
+				end
+			2'b01:	current_credit <= current_credit - 1'b1;
+			2'b10:	current_credit <= current_credit + credit;
+			2'b11:	current_credit <= current_credit + credit - 1'b1;
+			default: begin 
+					current_credit <= 'h0;
+					return_credit <= 1'b0;
+				end 
 			endcase 
 
 
