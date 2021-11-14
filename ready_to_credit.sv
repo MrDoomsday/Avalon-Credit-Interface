@@ -62,8 +62,7 @@ wire fifo_rd, fifo_wr;
 always_ff @ (posedge clk or negedge reset_n)
 	if(!reset_n)
 		stream_in <= 'h0;
-	else 	
-	begin 
+	else begin 
 		stream_in.channel 	<= avsi_channel;
 		stream_in.data		<= avsi_data;
 		stream_in.valid		<= avsi_valid;
@@ -113,28 +112,23 @@ always_ff @ (posedge clk or negedge reset_n)
 
 
 always_ff @ (posedge clk or negedge reset_n)
-	if(!reset_n)
-	begin 
+	if(!reset_n) begin 
 		credit 			<= 'h0;
 		update_credit 	<= 1'h0;
 	end 
-	else 	if(reset_register[15])
-			begin 
+	else 	if(reset_register[15]) begin 
 				credit 			<= 2**credit_width-1;
 				update_credit 	<= 1'b1;
 			end 
-			else 	if(fifo_rd && return_credit)
-					begin 
+			else 	if(fifo_rd && return_credit) begin 
 						credit 			<= 'h2;
 						update_credit 	<= 1'b1;
 					end 
-					else 	if(fifo_rd || return_credit)
-							begin 
+					else 	if(fifo_rd || return_credit) begin 
 								credit 			<= 'h1;
 								update_credit 	<= 1'h1;
 							end 
-							else 
-							begin 
+							else begin 
 								credit 			<= 'h0;
 								update_credit 	<= 1'b0;
 							end 
@@ -150,24 +144,21 @@ always_ff @ (posedge clk or negedge reset_n)
 							
 //output logic 
 always_ff @ (posedge clk or negedge reset_n)
-	if(!reset_n)
-	begin 
-		avso_channel 	<= 'h0;
-		avso_data 		<= 'h0;
-		avso_valid 		<= 'h0;
-		avso_sop 		<= 'h0;
-		avso_eop 		<= 'h0;
-		avso_empty 		<= 'h0;	
+	if(!reset_n)	avso_valid <= 1'b0;
+	else if(avso_ready)	avso_valid <= stream_out[1].valid;
+
+
+
+
+always_ff @ (posedge clk)
+	if(avso_ready)	begin 
+		avso_channel 	<= stream_out[1].channel;
+		avso_data 		<= stream_out[1].data;
+		avso_valid 		<= stream_out[1].valid;
+		avso_sop 		<= stream_out[1].sop;
+		avso_eop 		<= stream_out[1].eop;
+		avso_empty 		<= stream_out[1].empty;				
 	end 
-	else 	if(avso_ready)
-			begin 
-				avso_channel 	<= stream_out[1].channel;
-				avso_data 		<= stream_out[1].data;
-				avso_valid 		<= stream_out[1].valid;
-				avso_sop 		<= stream_out[1].sop;
-				avso_eop 		<= stream_out[1].eop;
-				avso_empty 		<= stream_out[1].empty;				
-			end 
 
 
 endmodule 
